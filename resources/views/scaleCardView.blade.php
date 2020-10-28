@@ -213,31 +213,31 @@
         Supported by Sawit Mitra Online (SAMO)
     </div>
     <div id="company">
-        <h2 class="name">PT. YUNITED BERSAUDARA SEJAHTERA</h2>
-        <div>Jl Umbansari Nomor 1, Rumbai, Pekanbaru</div>
-        <div>(0761) 510450</div>
+        <h2 class="name">{{$data['pks']['company_name']}}</h2>
+        <div>{{$data['pks']['address']}}, {{$data['pks']['district']['name']}}, {{$data['pks']['city']['name']}}</div>
+        <div>{{$data['pks']['telephone']}}</div>
     </div>
     </div>
 </header>
 <main>
     <div id="details" class="clearfix">
         <div id="client">
-            <div class="to">Sumber / Mitra Tani : Bapak/Ibu Harimuardasyah</div>
-            <div class="to">Komoditi : Tandan Buah Segar (TBS)</div>
+            <div class="to">Sumber / Mitra Tani : {{$data['mitra_tani_name']}}</div>
+            <div class="to">Komoditi : {{$data['commodity']}}</div>
             <div class="to">Kendaraan Pengangkut : Truk</div>
-            <div class="to">Nama Supir : Gobang</div>
+            <div class="to">Nama Supir : {{$data['driver_name']}}</div>
             <div class="to">Nomor SIM : N/A</div>
-            <div class="to">Nomor Polisi : BM2367TU</div>
+            <div class="to">Nomor Polisi : {{$data['vehicle_number']}}</div>
         </div>
         <div id="invoice">
             <h1>KARTU TIMBANGAN</h1>
-            <div class="to">Nomor Kartu : PKS123456</div>
-            <div class="date">Tanggal : 20-09-2020</div>
+            <div class="to">Nomor Kartu : samo-pks-{{$data['id']}}</div>
+            <div class="date">Tanggal : {{date('d M Y', strtotime($data['created_at']))}}</div>
         </div>
     </div>
 
 
-    {{--
+{{--
     <h2>Kriteria Sortasi</h2>
     <table border="0" cellspacing="0" cellpadding="0" style="width: 100%">
         <tr>
@@ -261,9 +261,10 @@
     </table>
     --}}
 
+
     <hr>
     <h2>Spesifikasi</h2>
-    <h3>Jumlah Janjang : 998 | SORTASI : 2,5 % | KOMIDEL : 15,00 KG</h3>
+    <h3>Jumlah Janjang : - | KOMIDEL : - | SORTASI : {{$data['sorting_percentage']}} %</h3>
     <hr>
     <h2>Berat Timbangan dan <Potongan></Potongan></h2>
     <table border="0" cellspacing="0" cellpadding="0">
@@ -277,36 +278,38 @@
         </thead>
         <tbody>
         <tr>
-            <td class="desc" colspan="4"><h3>Timbangan Masuk</h3>Dilakukan tanggal <strong>20-09-2020 19:00:00</strong> oleh petugas <strong>Darman</strong></td>
-            <td class="total">Berat : <strong>26,850 KG</strong></td>
+            <td class="desc" colspan="4"><h3>Timbangan Masuk</h3>Dilakukan tanggal <strong>{{date('Y-m-d H:i:s', $data['weight_in_timestamp'])??'-'}}</strong> oleh petugas <strong>{{$data['weight_in_by']['email']??'-'}}</strong></td>
+            <td class="total">Berat : <strong>{{$data['weight_in']??'-'}} KG</strong></td>
         </tr>
         <tr>
-            <td class="desc" colspan="4"><h3>Timbangan Keluar</h3>Dilakukan tanggal <strong>20-09-2020 19:00:00</strong> oleh petugas <strong>Darman</strong></td>
-            <td class="total">Berat : <strong>11,500 KG</strong></td>
+            <td class="desc" colspan="4"><h3>Timbangan Keluar</h3>Dilakukan tanggal <strong>{{date('Y-m-d H:i:s', $data['weight_out_timestamp'])??'-'}}</strong> oleh petugas <strong>{{$data['weight_out_by']['email']??'-'}}</strong></td>
+            <td class="total">Berat : <strong>{{$data['weight_out']??'-'}} KG</strong></td>
         </tr>
         </tbody>
         <tfoot>
         <tr>
             <td colspan="2"></td>
             <td colspan="2">BRUTO</td>
-            <td>15,350 KG</td>
+            <td>{{$data['netto_pre_sorting']}} KG</td>
         </tr>
         <tr>
             <td colspan="2"></td>
             <td colspan="2">POTONGAN</td>
-            <td>384 KG</td>
+            <td>{{$data['sorting_weight']}} KG</td>
         </tr>
         <tr>
             <td colspan="2"></td>
             <td colspan="2">NETTO</td>
-            <td>14,966 KG</td>
+            <td>{{$data['final_netto']}} KG</td>
         </tr>
         </tfoot>
     </table>
     <hr>
     <table border="0" cellspacing="0" cellpadding="0" style="width: 30%">
-        Telah diberikan dengan baik kepada :
-        <br><br><br><br><br><br>Pengangkut / Pengemudi
+        Telah diserah terimakan dengan baik kepada :
+        <br><br><br><br><br><br> Petugas PKS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Pengangkut
     </table>
 
 </main>

@@ -16,20 +16,31 @@
                     </div>
                     <div class="card-body">
                         <div class="card-body table-responsive p-0">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#transaction-modal">Add Transaction</button>
+                            @if(in_array('4',Session::get('role')))
+                                <div class="row">
+                                    <div class="col-md-6 pull-right">
+                                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#transaction-modal">Add Transaction</button>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
+
                             <br>
-                            <table class="table table-bordered dt-responsive nowrap" id="table-product">
+                            <table class="table table-bordered dt-responsive nowrap" id="table">
                                 <thead>
                                 <tr>
+                                    <th>  </th>
+                                    <th> ID </th>
                                     <th> Tanggal Transaksi </th>
                                     <th> Mitra Tani / Supplier </th>
                                     <th> Nomor Polisi </th>
                                     <th> Nama Pengemudi </th>
                                     <th> Stage </th>
+                                    <th> Weight In </th>
+                                    <th> Weight Out </th>
+                                    <th> sorting_percentage </th>
+                                    <th> sorting_weight </th>
+                                    <th> netto_pre_sorting </th>
+                                    <th> Action </th>
 
                                 </tr>
                                 </thead>
@@ -105,7 +116,7 @@
         <!-- /.modal-dialog -->
     </div>
 
-    <div class="modal fade" id="timbangan-masuk-modal">
+    {{--<div class="modal fade" id="timbangan-masuk-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -145,6 +156,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Mitra Tani/Supplier : </label> <label id="mitra-tani-label"></label>
+                        </div>
+                        <input type="text" class="form-control" id="sortir-transaction-id-textfield" placeholder="">
+                    </div>
+                    <hr>
                     <form id="transaction-form" role="form" enctype="multipart/form-data">
                         <div class="box-body">
                             <div class="form-group">
@@ -154,7 +172,7 @@
                         </div>
                         <div class="box-body">
                             <div class="form-group">
-                                <label for="exampleInputEmail1">Sortasi</label>
+                                <label for="exampleInputEmail1" id="">Sortasi</label>
                                 <input type="text" class="form-control" name="sorting_percentage" placeholder="">
                             </div>
                         </div>
@@ -205,7 +223,7 @@
             <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
-    </div>
+    </div>--}}
 @stop
 
 @section('css')
@@ -216,36 +234,34 @@
     <script>
         console.log('Hi!');
         $(document).ready(function(){
-            var table = $('#table-product').DataTable({
+            var table = $('#table').DataTable({
                 pageLength: 10,
                 processing: true,
                 serverSide: true,
-                //dom: '<"html5buttons">Blfrtip',
-                /*language: {
-                    buttons: {
-                        colvis : 'show / hide', // label button show / hide
-                        colvisRestore: "Reset Kolom" //lael untuk reset kolom ke default
-                    }
-                },*/
-
-                /*buttons : [
-                    {extend: 'colvis', postfixButtons: [ 'colvisRestore' ] },
-                    {extend:'csv'},
-                    {extend: 'pdf', title:'Contoh File PDF Datatables'},
-                    {extend: 'excel', title: 'Contoh File Excel Datatables'},
-                    {extend:'print',title: 'Contoh Print Datatables'},
-                ],*/
                 ajax: {
                     "url"  : "{{url('fetch-transaction')}}",
-                    /*"data" : function (d) {
-                        d.filter_periode = $('#filter_periode').val();
-                    }*/
+                    "data" : {
+                        //"stageRequest" : 9,
+                    }
                 },
                 columns: [
+                    {
+                        "className":      'details-control',
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": '<strong style="cursor: pointer;">+</strong>'
+                    },
+                    {"data":"id"},
                     {"data":"created_at"},
                     {"data":"mitra_tani_name"},
                     {"data":"vehicle_number"},
                     {"data":"driver_name"},
+                    {"data":"weight_in"},
+                    {"data":"weight_out"},
+                    {"data":"sorting_percentage"},
+                    {"data":"sorting_weight"},
+                    {"data":"netto_pre_sorting"},
+                    {"data":"final_netto"},
 
                     {
                         "render": function (data, type, row) {
@@ -254,11 +270,11 @@
                             } else if(row.transaction_stage == 4) {
                                 return '<button type="button" class="btn btn-block btn-warning btn-xs" data-toggle="modal" data-target="#timbangan-masuk-modal">Timbangan Masuk</button>';
                             } else if(row.transaction_stage == 5) {
-                                return '<button type="button" class="btn btn-block btn-danger btn-xs" data-toggle="modal" data-target="#proses-sortir-modal">Proses Sortir</button>';
+                                return '<button type="button" class="btn btn-block btn-danger btn-xs" onclick="addSortir('+row.id+',\''+row.mitra_tani_name+'\')">Proses Sortir</button>';
                             } else if(row.transaction_stage == 6) {
                                 return '<button type="button" class="btn btn-block btn-primary btn-xs" data-toggle="modal" data-target="#timbangan-keluar-modal">Timbangan Keluar</button>';
                             } else if(row.transaction_stage == 7) {
-                                return '<button type="button" class="btn btn-block btn-success btn-xs" onclick="window.open(\'{{url('print-scale-card')}}\', \'_blank\')" >Cetak Kartu</button>';
+                                return '<button type="button" class="btn btn-block btn-success btn-xs" onclick="window.open(\'{{url('print-scale-card')}}/'+row.id+' \', \'_blank\')" >Cetak Kartu</button>';
                             }
                             else {
                                 return 'Proses';
@@ -266,16 +282,44 @@
                         },
                     }
                 ],
-                /*columnDefs : [{
-                    "defaultContent": "<button>Click!</button>"
-                    /!*render : function (data,type,row){
-                        return data + ' - ( ' + row['satuan'] + ')';
-                    },
-                    "targets" : 0*!/
-                },
 
-                    /!*{"visible": false, "targets" : 1}*!/
-                ],*/
+                "columnDefs": [
+                    {
+                        "targets": 5,
+                        "visible": false,
+                        "orderable": false
+                    },
+                    {
+                        "targets": 6,
+                        "visible": false,
+                        "orderable": false
+                    },
+                    {
+                        "targets": 7,
+                        "visible": false,
+                        "orderable": false
+                    },
+                    {
+                        "targets": 8,
+                        "visible": false,
+                        "orderable": false
+                    },
+                    {
+                        "targets": 9,
+                        "visible": false,
+                        "orderable": false
+                    },
+                    {
+                        "targets": 10,
+                        "visible": false,
+                        "orderable": false
+                    },
+                    {
+                        "targets": 11,
+                        "visible": false,
+                        "orderable": false
+                    },
+                ],
 
                 rowCallback: function(row, data, index) {
                     if (data.transaction_stage == 7) {
@@ -286,35 +330,61 @@
 
             });
 
-            $.fn.dataTableExt.afnFiltering.push(
-                function( oSettings, aData, iDataIndex ) {
-                    return aData[filterIndex].indexOf(filterStr)>-1;
+            $('#table tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row( tr );
+
+                if ( row.child.isShown() ) {
+                    row.child.hide();
+                    tr.removeClass('shown');
                 }
-            );
+                else {
+                    row.child( format(row.data()) ).show();
+                    tr.addClass('shown');
+                }
+            } );
 
-            /*
-            //filter berdasarkan Nama Product
-            $('.filter-name').keyup(function () {
-                table.column( $(this).data('column'))
-                    .search( $(this).val() )
-                    .draw();
-            });
+            function format ( d ) {
+                return '<h5></h5>' +
+                    '<div class="row">' +
+                    '<div class="col-md-4">' +
+                    '<table style="border: 0px;">' +
+                    '<tbody>' +
 
-            //filter Berdasarkan satuan product
-            $('.filter-satuan').change(function () {
-                table.column( $(this).data('column'))
-                    .search( $(this).val() )
-                    .draw();
-            });
+                    '<tr style="border: 0px;">' +
+                    '<td style="border: 0px;"> <strong>Timbangan masuk</strong> </td>' +
+                    '<td style="border: 0px;"> : </td> ' +
+                    '<td style="border: 0px;">' + d.weight_in +'</td>' +
 
-            //filter Berdasarkan periode
-            $('#filter_periode').change(function () {
-                table.draw();
-            });
-*/
+                    '<td style="border: 0px;"> <strong>Timbangan Keluar</strong> </td>' +
+                    '<td style="border: 0px;"> : </td> ' +
+                    '<td style="border: 0px;">' + d.weight_out +'</td>' +
+                    '<td style="border: 0px;"> <strong>Sortasi</strong> </td>' +
+                    '<td style="border: 0px;"> : </td> ' +
+                    '<td style="border: 0px;">' + d.sorting_percentage +' %</td>' +
+                    '</tr>' +
+
+
+                    '<tr style="border: 0px;">' +
+                    '<td style="border: 0px;"> <strong>Bruto</strong> </td>' +
+                    '<td style="border: 0px;"> : </td> ' +
+                    '<td style="border: 0px;">' + d.netto_pre_sorting +'</td>' +
+                    '<td style="border: 0px;"> <strong>Potongan</strong> </td>' +
+                    '<td style="border: 0px;"> : </td> ' +
+                    '<td style="border: 0px;">' + d.sorting_weight +'</td>' +
+                    '<td style="border: 0px;"> <strong>Netto</strong> </td>' +
+                    '<td style="border: 0px;"> : </td> ' +
+                    '<td style="border: 0px;"><strong>' + d.final_netto +'</strong></td>' +
+                    '</tr>' +
+
+
+                    '</tbody>' +
+                    '</table>' +
+                    '</div>' +
+                    '</div>'
+            }
 
             $(function () {
-
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -347,5 +417,10 @@
 
             });
         });
+
+        /*setInterval(function () {
+            table.draw();
+        },10000);*/
+
     </script>
 @stop

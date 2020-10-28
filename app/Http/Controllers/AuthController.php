@@ -15,7 +15,7 @@ class AuthController extends Controller
     public function loginAction(Request $request) {
         $endPoint = 'api/login';
         $response = Http::withHeaders([
-            'Authorization' => 'hehehe',
+            'Authorization' => 'unnecessary',
         ])->post(env('BACKEND_URL').$endPoint,
             [
                 'email' => $request->email,
@@ -24,9 +24,19 @@ class AuthController extends Controller
         );
 
         $response = json_decode($response->body());
-        //echo $response->body(); die();
+        //echo $response->jwtToken; die();
+        //get payload from jwt
+        $payload = explode('.',$response->jwtToken);
+        $payload = $payload[1];
+        $payload = base64_decode($payload);
+        //echo $payload; die();
+        $payload = json_decode($payload, true);
+
         if($response->status == 'success'){
             $request->session()->put('jwtToken', $response->jwtToken);
+            $request->session()->put('role', $payload['role']);
+            $request->session()->put('userId', $payload['user_id']);
+            $request->session()->put('pksId', $payload['pks'][0]);
             return redirect('/dashboard-page');
         } else {
             return redirect('/')->with(['error' => $response->message]);

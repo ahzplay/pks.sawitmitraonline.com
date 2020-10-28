@@ -28,6 +28,7 @@ Route::group(['middleware' => 'pageAuth'], function(){
 });
 
 Route::get('/fetch-transaction', [DashboardController::class, 'fetchTransactions']);
+Route::post('/update-sortir', [DashboardController::class, 'updateSortir']);
 Route::post('/create-transaction', [DashboardController::class, 'addTransaction']);
-Route::get('/print-scale-card', [DashboardController::class, 'printScaleCard']);
+Route::get('/print-scale-card/{id}', [DashboardController::class, 'printScaleCard']);
 Route::get('/logout-process', [DashboardController::class, 'logoutProcess']);

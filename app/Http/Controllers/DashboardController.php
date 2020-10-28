@@ -12,11 +12,12 @@ class DashboardController
     public function fetchTransactions(Request $request) {
         $endPoint = 'api/fetch-transaction';
         $response = Http::withHeaders([
-            'Authorization' => 'hehehe',
+            'Authorization' => 'Bearer ' . $request->session()->get('jwtToken'),
         ])->post(env('BACKEND_URL').$endPoint,
             [
-                'email' => $request->email,
-                'password' => $request->password,
+                'pksId' => $request->session()->get('pksId'),
+                'stageRequest' => $request->stageRequest,
+                'search' => $request->search['value'],
             ]
         );
 
@@ -32,6 +33,25 @@ class DashboardController
                 'mitra_tani_name' => $request->mitra_tani_name,
                 'vehicle_number' => $request->vehicle_number,
                 'driver_name' => $request->driver_name,
+                'pks_id' => $request->session()->get('pksId'),
+                'created_by' => $request->session()->get('userId'),
+            ]
+        );
+
+        echo $response->body();
+    }
+
+    public function updateSortir(Request $request) {
+        $endPoint = 'api/update-sortir';
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $request->session()->get('jwtToken'),
+        ])->post(env('BACKEND_URL').$endPoint,
+            [
+                'id' => $request->id,
+                'totalLong' => $request->totalLong,
+                'sortingPercentage' => $request->sortingPercentage,
+                'komidel' => $request->komidel,
+                'sortingWeight' => $request->sortingWeight,
             ]
         );
 
@@ -39,7 +59,17 @@ class DashboardController
     }
 
     public function printScaleCard(Request $request) {
-        return view('scaleCardView');
+        $endPoint = 'api/fetch-detail-transaction';
+        $response = Http::withHeaders([
+            //'Authorization' => 'Bearer ' . $request->session()->get('jwtToken'),
+        ])->post(env('BACKEND_URL').$endPoint,
+            [
+                'id' => $request->id,
+            ]
+        );
+
+        $dataParsed = json_decode($response->body(), true);
+        return view('scaleCardView')->with('data', $dataParsed);
     }
 
     public function logoutProcess(Request $request) {
@@ -47,9 +77,8 @@ class DashboardController
         return redirect('/');
     }
 
-
-
     public function index(Request $request) {
+        echo $request->session()->get('jwtToken');
         return view('dashboard');
     }
 }

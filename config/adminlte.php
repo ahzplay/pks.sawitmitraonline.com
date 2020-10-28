@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'AdminLTE 3',
+    'title' => 'SAMO-PKS',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -45,13 +45,14 @@ return [
     |
     */
 
-    'logo' => '<b>SAMO</b>-PKS',
+    'logo' => null,
     //'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img' => 'vendor/adminlte/dist/img/samo-logo.png',
+    'logo_img' => url('img/samo-logo.png'),
+    'logo_img_size' => 40,
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'AdminLTE',
+    'logo_img_alt' => 'FOR PKS',
 
     /*
     |--------------------------------------------------------------------------
@@ -230,7 +231,6 @@ return [
     | https://github.com/jeroennoten/Laravel-AdminLTE/#8-menu-configuration
     |
     */
-
     'menu' => [
         [
             'text' => 'search',
@@ -243,10 +243,10 @@ return [
             'can'  => 'manage-blog',
         ],
         [
-            'text'        => 'Dashboard',
+            'text'        => 'Transaction',
             'url'         => 'dashboard-page',
-            //'icon'        => 'far fa-fw fa-file',
-            //'label'       => null,
+            'icon'        => 'far fa-coins',
+            'label'       => null,
             //'label_color' => 'success',
         ],
         [
