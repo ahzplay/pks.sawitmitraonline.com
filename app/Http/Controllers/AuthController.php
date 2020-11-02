@@ -24,15 +24,17 @@ class AuthController extends Controller
         );
 
         $response = json_decode($response->body());
+        //echo $response->status; die();
         //echo $response->jwtToken; die();
-        //get payload from jwt
-        $payload = explode('.',$response->jwtToken);
-        $payload = $payload[1];
-        $payload = base64_decode($payload);
-        //echo $payload; die();
-        $payload = json_decode($payload, true);
 
         if($response->status == 'success'){
+            //get payload from jwt
+            $payload = explode('.',$response->jwtToken);
+            $payload = $payload[1];
+            $payload = base64_decode($payload);
+            //echo $payload; die();
+            $payload = json_decode($payload, true);
+
             $request->session()->put('jwtToken', $response->jwtToken);
             $request->session()->put('role', $payload['role']);
             $request->session()->put('userId', $payload['user_id']);

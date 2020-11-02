@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Http;
 class DashboardController
 {
     public function fetchTransactions(Request $request) {
-        $endPoint = 'api/fetch-transaction';
+        //echo json_encode($request->columns); die();
+        $endPoint = 'api/fetch-datatables-transaction';
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $request->session()->get('jwtToken'),
         ])->post(env('BACKEND_URL').$endPoint,
@@ -18,6 +19,8 @@ class DashboardController
                 'pksId' => $request->session()->get('pksId'),
                 'stageRequest' => $request->stageRequest,
                 'search' => $request->search['value'],
+                'start' => $request->start,
+                'length' => $request->length,
             ]
         );
 
@@ -61,13 +64,14 @@ class DashboardController
     public function printScaleCard(Request $request) {
         $endPoint = 'api/fetch-detail-transaction';
         $response = Http::withHeaders([
-            //'Authorization' => 'Bearer ' . $request->session()->get('jwtToken'),
+            'Authorization' => 'Bearer ' . $request->session()->get('jwtToken'),
         ])->post(env('BACKEND_URL').$endPoint,
             [
                 'id' => $request->id,
             ]
         );
 
+        //echo $response->body(); die();
         $dataParsed = json_decode($response->body(), true);
         return view('scaleCardView')->with('data', $dataParsed);
     }
@@ -78,7 +82,7 @@ class DashboardController
     }
 
     public function index(Request $request) {
-        echo $request->session()->get('jwtToken');
+        //echo $request->session()->get('jwtToken');
         return view('dashboard');
     }
 }
