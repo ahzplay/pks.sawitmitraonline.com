@@ -377,6 +377,13 @@
                     '<td style="border: 0px;"><strong>' + d.final_netto +'</strong></td>' +
                     '</tr>' +
 
+                    '<tr>' +
+                    '<td colspan="9" style="border: 0px;"> ' +
+                    '<a href="' + d.weight_in_picture_url + '" target="_blank"><img width="240" src="' + d.weight_in_picture_url + '" /> </a> &nbsp;&nbsp; ' +
+                    '<a href="' + d.sorting_weight_picture_url + '" target="_blank"><img width="240" src="' + d.sorting_weight_picture_url + '" /> </a> &nbsp;&nbsp; ' +
+                    '<a href="' + d.weight_out_picture_url + '" target="_blank"><img width="240" src="' + d.weight_out_picture_url + '" /> </a> ' +
+                    '</td>' +
+                    '</tr>' +
 
                     '</tbody>' +
                     '</table>' +
